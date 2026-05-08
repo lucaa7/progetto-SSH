@@ -5,9 +5,13 @@ from typing import Optional, List
 from netmiko import ConnectHandler
 from netmiko.exceptions import NetmikoAuthenticationException, NetmikoTimeoutException
 
+
+# python sshTelnetclient.py 192.168.1.254 cisco -p PswSSH5M! -P 23 -d cisco -c "show run"
+# python sshTelnetclient.py 10.40.172.200 rconfig -p pswSSH -P 23 -d mikrotik -c "/export"
+
 DEVICE_MAP = {
     ("mikrotik",  "ssh"):    "mikrotik_routeros",
-    ("mikrotik",  "telnet"): "generic_telnet",
+    ("mikrotik",  "telnet"): "mikrotik_routeros",
     ("cisco",     "ssh"):    "cisco_s300",
     ("cisco",     "telnet"): "cisco_s300_telnet",
     ("cisco_ios", "ssh"):    "cisco_ios",
