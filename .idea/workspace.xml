@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ff7fb5c7-d089-41d1-873d-b235dbefaa24" name="Changes" comment="netmiko problem with telnet maybe pty?">
+    <list default="true" id="ff7fb5c7-d089-41d1-873d-b235dbefaa24" name="Changes" comment="easy">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sshTelnetclient.py" beforeDir="false" afterPath="$PROJECT_DIR$/sshTelnetclient.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/mikrotik_telnet.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sshTelnetclient.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/sshTelnetclient.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +66,7 @@
       <recent name="C:\Users\lucas\PycharmProjects\progettoSSH\templates" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\lucas\PycharmProjects\progettoSSH\backend" />
       <recent name="C:\Users\lucas\PycharmProjects\progettoSSH" />
       <recent name="C:\Users\lucas\PycharmProjects\progettoSSH\public\static" />
       <recent name="C:\Users\lucas\PycharmProjects\progettoSSH\ssh" />
@@ -130,13 +133,22 @@
       <option name="project" value="LOCAL" />
       <updated>1778076934101</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="easy">
+      <option name="closed" value="true" />
+      <created>1778235585963</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1778235585963</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="start" />
     <MESSAGE value="netmiko problem with telnet maybe pty?" />
-    <option name="LAST_COMMIT_MESSAGE" value="netmiko problem with telnet maybe pty?" />
+    <MESSAGE value="easy" />
+    <option name="LAST_COMMIT_MESSAGE" value="easy" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

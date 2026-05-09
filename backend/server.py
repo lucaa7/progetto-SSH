@@ -1,7 +1,7 @@
 """
-FastAPI wrapper attorno al client SSH Paramiko.
+FastAPI wrapper attorno al client SSH/Telnet Netmiko.
 Avvio:
-    pip install fastapi uvicorn paramiko
+    pip install fastapi uvicorn netmiko
     uvicorn backend.server:app --host localhost --port 8000
 
 Espone:
@@ -10,23 +10,34 @@ Espone:
 """
 from __future__ import annotations
 
-import io
-import socket
-import sys
 import time
-import re
-from contextlib import redirect_stdout, redirect_stderr
 from typing import List, Optional
+from pathlib import Path
 
-import paramiko
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-from ssh.Devices import DEVICE_PROFILES
-from ssh.client import ANSI_ESCAPE, read_until_prompt, send_command_shell, send_command_exec
+
+from netmiko import ConnectHandler
+from netmiko.exceptions import NetmikoAuthenticationException, NetmikoTimeoutException
+
+# ─────────── Mappa device → netmiko device_type ───────────
+DEVICE_MAP = {
+    ("mikrotik",  "ssh"):    "mikrotik_routeros",
+    ("mikrotik",  "telnet"): "mikrotik_routeros",
+    ("cisco",     "ssh"):    "cisco_s300",
+    ("cisco",     "telnet"): "cisco_s300_telnet",
+    ("cisco_ios", "ssh"):    "cisco_ios",
+    ("cisco_ios", "telnet"): "cisco_ios_telnet",
+    ("generic",   "ssh"):    "terminal_server",
+    ("generic",   "telnet"): "generic_telnet",
+}
+
+SUPPORTED_DEVICES = list({k[0] for k in DEVICE_MAP.keys()})
 
 
-# ─────────── API ───────────
+# ─────────── Modelli API ───────────
 class CommandResult(BaseModel):
     command: str
     output: str
@@ -54,11 +65,12 @@ class RunResponse(BaseModel):
     error: Optional[str] = None
 
 
+# ─────────── App ───────────
 app = FastAPI(title="rConfig-lite SSH backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # in LAN va bene; restringi in produzione
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -66,98 +78,69 @@ app.add_middleware(
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "profiles": list(DEVICE_PROFILES.keys())}
+    return {"ok": True, "devices": SUPPORTED_DEVICES}
 
 
 @app.post("/api/run", response_model=RunResponse)
 def run(req: RunRequest):
-    if req.device not in DEVICE_PROFILES:
-        raise HTTPException(400, f"device must be one of {list(DEVICE_PROFILES)}")
+    if req.device not in SUPPORTED_DEVICES:
+        raise HTTPException(400, f"device must be one of {SUPPORTED_DEVICES}")
 
-    profile = DEVICE_PROFILES[req.device]
-    prompt_endings = profile["prompt_endings"]
-    use_shell = profile["use_shell"]
-    term = profile["term"]
-    paging_cmd = profile["disable_paging_cmd"]
+    proto = "ssh" if req.port == 22 else "telnet"
+    device_type = DEVICE_MAP.get((req.device, proto), "terminal_server")
 
-    client = paramiko.SSHClient()
-    if req.no_host_key_check:
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    else:
-        client.set_missing_host_key_policy(paramiko.WarningPolicy())
-        client.load_system_host_keys()
-
-    connect_kwargs = {
-        "hostname": req.host,
-        "port": req.port,
-        "username": req.user,
-        "timeout": 15,
-        "disabled_algorithms": {"pubkeys": ["rsa-sha2-256", "rsa-sha2-512"]},
-        "look_for_keys": False,
-        "allow_agent": False,
+    conn_params = {
+        "device_type": device_type,
+        "host":        req.host,
+        "username":    req.user,
+        "password":    req.password or "",
     }
-    if req.password:
-        connect_kwargs["password"] = req.password
-    if req.key_path:
-        connect_kwargs["key_filename"] = req.key_path
 
-    banner_text = None
+    if proto == "ssh":
+        conn_params["port"] = req.port
+
+    if req.no_host_key_check and proto == "ssh":
+        conn_params["ssh_strict"] = False
+
+    if req.key_path:
+        conn_params["key_file"] = req.key_path
+
     results: List[CommandResult] = []
 
     try:
-        client.connect(**connect_kwargs)
-        channel = None
-        if use_shell:
-            channel = client.invoke_shell(term=term, width=200, height=50)
-            channel.set_combine_stderr(True)
-            banner_text = read_until_prompt(channel, prompt_endings, timeout=20).strip() or None
-            if paging_cmd:
-                send_command_shell(channel, paging_cmd, prompt_endings, timeout=10)
-
-        for cmd in req.commands:
-            t0 = time.time()
-            err = None
-            try:
-                if use_shell:
-                    out = send_command_shell(channel, cmd, prompt_endings, timeout=120)
-                else:
-                    out = send_command_exec(client, cmd, timeout=120)
-            except Exception as exc:
+        with ConnectHandler(**conn_params) as conn:
+            for cmd in req.commands:
+                t0 = time.time()
+                err = None
                 out = ""
-                err = str(exc)
-            results.append(CommandResult(
-                command=cmd, output=out,
-                duration_ms=int((time.time() - t0) * 1000),
-                error=err,
-            ))
+                try:
+                    out = conn.send_command(cmd, read_timeout=120)
+                except Exception as exc:
+                    err = str(exc)
+                results.append(CommandResult(
+                    command=cmd,
+                    output=out,
+                    duration_ms=int((time.time() - t0) * 1000),
+                    error=err,
+                ))
 
-        if channel:
-            channel.close()
+        return RunResponse(
+            host=req.host, device=req.device,
+            success=True, results=results,
+        )
 
-        return RunResponse(host=req.host, device=req.device, success=True,
-                           banner=banner_text, results=results)
-
-    except paramiko.AuthenticationException as exc:
+    except NetmikoAuthenticationException as exc:
         return RunResponse(host=req.host, device=req.device, success=False,
                            results=[], error=f"Auth failed: {exc}")
-    except paramiko.SSHException as exc:
+    except NetmikoTimeoutException as exc:
         return RunResponse(host=req.host, device=req.device, success=False,
-                           results=[], error=f"SSH error: {exc}")
-    except socket.timeout:
-        return RunResponse(host=req.host, device=req.device, success=False,
-                           results=[], error=f"Timeout connecting to {req.host}:{req.port}")
+                           results=[], error=f"Timeout: {exc}")
     except Exception as exc:
         return RunResponse(host=req.host, device=req.device, success=False,
-                           results=[], error=f"Generic error: {exc}")
-    finally:
-        client.close()
+                           results=[], error=f"Errore: {exc}")
 
 
-# ─────────── Servire la GUI statica (HTML/CSS/JS) ───────────
-# I file in ../static (index.html, style.css, app.js) sono serviti su /
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles
-
+# ─────────── Serve GUI statica ───────────
 _STATIC_DIR = Path(__file__).resolve().parent.parent / "public" / "static"
 if _STATIC_DIR.is_dir():
     app.mount("/", StaticFiles(directory=str(_STATIC_DIR), html=True), name="static")
