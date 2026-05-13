@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ff7fb5c7-d089-41d1-873d-b235dbefaa24" name="Changes" comment="easy">
+    <list default="true" id="ff7fb5c7-d089-41d1-873d-b235dbefaa24" name="Changes" comment="già fats">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/mikrotik_telnet.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sshTelnetclient.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/sshTelnetclient.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,14 +138,23 @@
       <option name="project" value="LOCAL" />
       <updated>1778235585963</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="già fats">
+      <option name="closed" value="true" />
+      <created>1778308781658</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1778308781658</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="start" />
     <MESSAGE value="netmiko problem with telnet maybe pty?" />
     <MESSAGE value="easy" />
-    <option name="LAST_COMMIT_MESSAGE" value="easy" />
+    <MESSAGE value="già fats" />
+    <option name="LAST_COMMIT_MESSAGE" value="già fats" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
