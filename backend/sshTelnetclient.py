@@ -58,7 +58,7 @@ def run_client(
                     print(f"{'='*60}")
                     print(f"Comando: {cmd}")
                     print(f"{'='*60}")
-                    output = conn.send_command(cmd, read_timeout=120)
+                    output = conn.send_command_timing(cmd, expect_string=r"[>#]", read_timeout=120, use_textfsm=False)
                     print(output)
                     print()
             else:

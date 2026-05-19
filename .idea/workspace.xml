@@ -4,8 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ff7fb5c7-d089-41d1-873d-b235dbefaa24" name="Changes" comment="già fats">
+    <list default="true" id="ff7fb5c7-d089-41d1-873d-b235dbefaa24" name="Changes" comment="quasi final commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/sshTelnetclient.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/sshTelnetclient.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/static/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/static/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/static/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/static/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/static/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,9 +68,9 @@
       <recent name="C:\Users\lucas\PycharmProjects\progettoSSH\templates" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\lucas\PycharmProjects\progettoSSH\public\static" />
       <recent name="C:\Users\lucas\PycharmProjects\progettoSSH\backend" />
       <recent name="C:\Users\lucas\PycharmProjects\progettoSSH" />
-      <recent name="C:\Users\lucas\PycharmProjects\progettoSSH\public\static" />
       <recent name="C:\Users\lucas\PycharmProjects\progettoSSH\ssh" />
     </key>
   </component>
